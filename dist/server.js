@@ -15,6 +15,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const app_1 = __importDefault(require("./app"));
 const mongoose_1 = __importDefault(require("mongoose"));
 const env_1 = require("./app/config/env");
+const seedSuperAdmin_1 = require("./app/utils/seedSuperAdmin");
 let server;
 const startServer = () => __awaiter(void 0, void 0, void 0, function* () {
     try {
@@ -27,7 +28,10 @@ const startServer = () => __awaiter(void 0, void 0, void 0, function* () {
         console.log(error);
     }
 });
-startServer();
+(() => __awaiter(void 0, void 0, void 0, function* () {
+    yield startServer();
+    yield (0, seedSuperAdmin_1.seedSuperAdmin)();
+}))();
 // Handle Server Error Start =====================================================================
 process.on("SIGINT", () => {
     console.log(`SIGINT receive. Server is shutting down... `);

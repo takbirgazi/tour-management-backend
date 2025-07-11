@@ -7,7 +7,7 @@ const http_status_codes_1 = __importDefault(require("http-status-codes"));
 const notFound = (req, res) => {
     res.status(http_status_codes_1.default.NOT_FOUND).json({
         success: false,
-        message: "Route Not Found"
+        message: "Route Not Found",
     });
 };
 exports.default = notFound;

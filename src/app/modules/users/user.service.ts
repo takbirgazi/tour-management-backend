@@ -31,7 +31,7 @@ const createUser = async (payload: Partial<IUser>) => {
 
 const updateUser = async (userId: string, payload: Partial<IUser>, decodedToken: JwtPayload) => {
     const ifUserExist = await User.findById(userId);
-    if (ifUserExist) {
+    if (!ifUserExist) {
         throw new AppError(statusCode.NOT_FOUND, "User Not Found!")
     }
     if (payload.role) {

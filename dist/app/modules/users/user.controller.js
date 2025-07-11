@@ -27,7 +27,7 @@ const createUser = (0, catchAsync_1.catchAsync)((req, res) => __awaiter(void 0, 
     });
 }));
 const updateUser = (0, catchAsync_1.catchAsync)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    const userId = req.params.id;
+    const userId = yield req.params.id;
     // const token = req.headers.authorization;
     // const decodedToken = verifyToken(token as string, envVars.JWT_ACCESS_SECRET) as JwtPayload;
     const decodedToken = req.user;

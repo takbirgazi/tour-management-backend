@@ -43,7 +43,7 @@ const createUser = (payload) => __awaiter(void 0, void 0, void 0, function* () {
 });
 const updateUser = (userId, payload, decodedToken) => __awaiter(void 0, void 0, void 0, function* () {
     const ifUserExist = yield user_model_1.User.findById(userId);
-    if (ifUserExist) {
+    if (!ifUserExist) {
         throw new AppError_1.default(http_status_codes_1.default.NOT_FOUND, "User Not Found!");
     }
     if (payload.role) {

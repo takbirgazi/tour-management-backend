@@ -16,7 +16,9 @@ exports.checkAuth = void 0;
 const env_1 = require("../config/env");
 const AppError_1 = __importDefault(require("../errorHelpers/AppError"));
 const jwt_1 = require("../utils/jwt");
-;
+const user_model_1 = require("../modules/users/user.model");
+const http_status_codes_1 = __importDefault(require("http-status-codes"));
+const user_interface_1 = require("../modules/users/user.interface");
 const checkAuth = (...authRoles) => (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const accessToken = req.headers.authorization;
@@ -24,6 +26,16 @@ const checkAuth = (...authRoles) => (req, res, next) => __awaiter(void 0, void 0
             throw new AppError_1.default(403, "No Access Token Found");
         }
         const verifiedToken = (0, jwt_1.verifyToken)(accessToken, env_1.envVars.JWT_ACCESS_SECRET);
+        const isExistUser = yield user_model_1.User.findOne({ email: verifiedToken.email });
+        if (!isExistUser) {
+            throw new AppError_1.default(http_status_codes_1.default.BAD_REQUEST, "User doesn't Exist!");
+        }
+        if (isExistUser.isActive === user_interface_1.IsActive.BLOCKED || isExistUser.isActive === user_interface_1.IsActive.INACTIVE) {
+            throw new AppError_1.default(http_status_codes_1.default.BAD_REQUEST, `User is ${isExistUser.isActive}`);
+        }
+        if (isExistUser.isDeleted) {
+            throw new AppError_1.default(http_status_codes_1.default.BAD_REQUEST, "User is deleted");
+        }
         if (!verifiedToken) {
             throw new AppError_1.default(403, "You are not authorize!");
         }

@@ -17,8 +17,12 @@ const catchAsync_1 = require("../../utils/catchAsync");
 const sendResponse_1 = __importDefault(require("../../utils/sendResponse"));
 const http_status_codes_1 = __importDefault(require("http-status-codes"));
 const auth_service_1 = require("./auth.service");
+const AppError_1 = __importDefault(require("../../errorHelpers/AppError"));
+const setCookie_1 = require("../../utils/setCookie");
 const credentialLogin = (0, catchAsync_1.catchAsync)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const user = yield auth_service_1.AuthService.credentialLogin(req.body);
+    // Set Cookies
+    (0, setCookie_1.setAuthCookie)(res, user);
     (0, sendResponse_1.default)(res, {
         statusCode: http_status_codes_1.default.OK,
         success: true,
@@ -26,6 +30,54 @@ const credentialLogin = (0, catchAsync_1.catchAsync)((req, res) => __awaiter(voi
         data: user
     });
 }));
+const getNewAccessToken = (0, catchAsync_1.catchAsync)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const refreshToken = req.cookies.refreshToken;
+    if (!refreshToken) {
+        throw new AppError_1.default(http_status_codes_1.default.BAD_REQUEST, "No Refresh token get from cookies!");
+    }
+    const tokenInfo = yield auth_service_1.AuthService.getNewAccessToken(refreshToken);
+    (0, setCookie_1.setAuthCookie)(res, tokenInfo);
+    (0, sendResponse_1.default)(res, {
+        statusCode: http_status_codes_1.default.OK,
+        success: true,
+        message: "Get Token Successfully!",
+        data: tokenInfo
+    });
+}));
+const logOut = (0, catchAsync_1.catchAsync)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    // destroy cookies
+    res.clearCookie("accessToken", {
+        httpOnly: true,
+        secure: false,
+        sameSite: "lax"
+    });
+    res.clearCookie("refreshToken", {
+        httpOnly: true,
+        secure: false,
+        sameSite: "lax"
+    });
+    (0, sendResponse_1.default)(res, {
+        statusCode: http_status_codes_1.default.OK,
+        success: true,
+        message: "Log Out Successfully!",
+        data: null
+    });
+}));
+const resetPassword = (0, catchAsync_1.catchAsync)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const oldPassword = req.body.oldPassword;
+    const newPassword = req.body.newPassword;
+    const decodedToken = req.user;
+    yield auth_service_1.AuthService.resetPassword(oldPassword, newPassword, decodedToken);
+    (0, sendResponse_1.default)(res, {
+        statusCode: http_status_codes_1.default.OK,
+        success: true,
+        message: "Password Changed Successfully!",
+        data: null
+    });
+}));
 exports.AuthControllers = {
     credentialLogin,
+    getNewAccessToken,
+    logOut,
+    resetPassword,
 };

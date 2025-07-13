@@ -3,7 +3,8 @@ import { IUser } from "../users/user.interface";
 import statusCode from 'http-status-codes';
 import { User } from "../users/user.model";
 import bcrypt from "bcryptjs";
-import { generateToken } from "../../utils/jwt";
+import { createUserTokens, newAccessTokenByRefreshToken } from "../../utils/userTokens";
+import { JwtPayload } from "jsonwebtoken";
 import { envVars } from "../../config/env";
 
 const credentialLogin = async (payload: Partial<IUser>) => {
@@ -19,20 +20,49 @@ const credentialLogin = async (payload: Partial<IUser>) => {
     if (!isPasswordMath) {
         throw new AppError(statusCode.BAD_REQUEST, "Incorrect Password!");
     }
-    const jwtPayload = {
-        userId: isExistUser._id,
-        email: isExistUser.email,
-        role: isExistUser.role,
-    };
 
-    const accessToken = generateToken(jwtPayload, envVars.JWT_ACCESS_SECRET, envVars.JWT_ACCESS_EXPIRES);
+    const userToken = createUserTokens(isExistUser);
+
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    const { password: noPass, ...rest } = isExistUser.toObject();
 
     return {
-        accessToken
+        accessToken: userToken.accessToken,
+        refreshToken: userToken.refreshToken,
+        user: rest
+    }
+};
+
+// Generate New Access Token by refresh token
+const getNewAccessToken = async (refreshToken: string) => {
+
+    const newAccessToken = await newAccessTokenByRefreshToken(refreshToken);
+
+    return {
+        accessToken: newAccessToken,
+    }
+};
+
+const resetPassword = async (oldPassword: string, newPassword: string, decodedToken: JwtPayload) => {
+
+    const user = await User.findById(decodedToken.userId);
+
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+    const isOldPasswordMatch = await bcrypt.compare(oldPassword, user!.password as string);
+    if (isOldPasswordMatch) {
+        throw new AppError(statusCode.UNAUTHORIZED, "Old Password Doesn't Match!")
     }
 
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+    user!.password = await bcrypt.hash(newPassword, Number(envVars.BCRYPT_SALT_ROUND));
+
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+    user!.save();
+ 
 };
 
 export const AuthService = {
     credentialLogin,
+    getNewAccessToken,
+    resetPassword,
 }

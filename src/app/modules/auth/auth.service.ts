@@ -49,7 +49,7 @@ const resetPassword = async (oldPassword: string, newPassword: string, decodedTo
 
     // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     const isOldPasswordMatch = await bcrypt.compare(oldPassword, user!.password as string);
-    if (isOldPasswordMatch) {
+    if (!isOldPasswordMatch) {
         throw new AppError(statusCode.UNAUTHORIZED, "Old Password Doesn't Match!")
     }
 

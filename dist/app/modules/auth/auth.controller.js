@@ -19,6 +19,8 @@ const http_status_codes_1 = __importDefault(require("http-status-codes"));
 const auth_service_1 = require("./auth.service");
 const AppError_1 = __importDefault(require("../../errorHelpers/AppError"));
 const setCookie_1 = require("../../utils/setCookie");
+const userTokens_1 = require("../../utils/userTokens");
+const env_1 = require("../../config/env");
 const credentialLogin = (0, catchAsync_1.catchAsync)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const user = yield auth_service_1.AuthService.credentialLogin(req.body);
     // Set Cookies
@@ -75,9 +77,24 @@ const resetPassword = (0, catchAsync_1.catchAsync)((req, res) => __awaiter(void 
         data: null
     });
 }));
+const googleCallback = (0, catchAsync_1.catchAsync)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    let redirectTo = req.query.state ? req.query.state : "";
+    if (redirectTo.startsWith("/")) {
+        redirectTo = redirectTo.slice(1);
+    }
+    const user = req.user;
+    if (!user) {
+        throw new AppError_1.default(http_status_codes_1.default.NOT_FOUND, "User Not Found");
+    }
+    ;
+    const tokenInfo = (0, userTokens_1.createUserTokens)(user);
+    (0, setCookie_1.setAuthCookie)(res, tokenInfo);
+    res.redirect(`${env_1.envVars.FRONTEND_URL}/${redirectTo}`);
+}));
 exports.AuthControllers = {
     credentialLogin,
     getNewAccessToken,
     logOut,
     resetPassword,
+    googleCallback,
 };

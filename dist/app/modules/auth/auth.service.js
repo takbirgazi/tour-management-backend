@@ -60,7 +60,7 @@ const resetPassword = (oldPassword, newPassword, decodedToken) => __awaiter(void
     const user = yield user_model_1.User.findById(decodedToken.userId);
     // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     const isOldPasswordMatch = yield bcryptjs_1.default.compare(oldPassword, user.password);
-    if (isOldPasswordMatch) {
+    if (!isOldPasswordMatch) {
         throw new AppError_1.default(http_status_codes_1.default.UNAUTHORIZED, "Old Password Doesn't Match!");
     }
     // eslint-disable-next-line @typescript-eslint/no-non-null-assertion

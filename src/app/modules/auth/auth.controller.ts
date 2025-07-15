@@ -1,4 +1,4 @@
-import { Request, Response } from "express";
+import { NextFunction, Request, Response } from "express";
 import { catchAsync } from "../../utils/catchAsync";
 import sendResponse from "../../utils/sendResponse";
 import httpStatusCode from 'http-status-codes';
@@ -8,20 +8,37 @@ import { setAuthCookie } from "../../utils/setCookie";
 import { createUserTokens } from "../../utils/userTokens";
 import { envVars } from "../../config/env";
 import { JwtPayload } from "jsonwebtoken";
+import passport from "passport";
 
 
-const credentialLogin = catchAsync(async (req: Request, res: Response) => {
-    const user = await AuthService.credentialLogin(req.body);
+const credentialLogin = catchAsync(async (req: Request, res: Response, next: NextFunction) => {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    passport.authenticate("local", async (err: any, user: any, info: any) => {
 
-    // Set Cookies
-    setAuthCookie(res, user);
+        if (err) {
+            return next(new AppError(httpStatusCode.FORBIDDEN, err));
+        }
+        if (!user) {
+            return next(new AppError(httpStatusCode.NOT_FOUND, info.message));
+        }
+        const userToken = await createUserTokens(user);
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
+        const { password: noPass, ...rest } = user.toObject();
 
-    sendResponse(res, {
-        statusCode: httpStatusCode.OK,
-        success: true,
-        message: "Log In Successfully!",
-        data: user
-    })
+        // Set Cookies
+        setAuthCookie(res, userToken);
+
+        sendResponse(res, {
+            statusCode: httpStatusCode.OK,
+            success: true,
+            message: "Log In Successfully!",
+            data: {
+                accessToken: userToken.accessToken,
+                refreshToken: userToken.refreshToken,
+                user: rest
+            }
+        })
+    })(req, res, next)
 });
 
 const getNewAccessToken = catchAsync(async (req: Request, res: Response) => {

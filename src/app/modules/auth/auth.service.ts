@@ -1,13 +1,15 @@
 import AppError from "../../errorHelpers/AppError";
-import { IUser } from "../users/user.interface";
 import statusCode from 'http-status-codes';
 import { User } from "../users/user.model";
 import bcrypt from "bcryptjs";
-import { createUserTokens, newAccessTokenByRefreshToken } from "../../utils/userTokens";
+import { newAccessTokenByRefreshToken } from "../../utils/userTokens";
 import { JwtPayload } from "jsonwebtoken";
 import { envVars } from "../../config/env";
 
-const credentialLogin = async (payload: Partial<IUser>) => {
+/**
+ * Its Handle by passport local
+ * 
+ const credentialLogin = async (payload: Partial<IUser>) => {
     const { email, password } = payload;
     const isExistUser = await User.findOne({ email });
 
@@ -32,6 +34,7 @@ const credentialLogin = async (payload: Partial<IUser>) => {
         user: rest
     }
 };
+ */
 
 // Generate New Access Token by refresh token
 const getNewAccessToken = async (refreshToken: string) => {
@@ -58,11 +61,9 @@ const resetPassword = async (oldPassword: string, newPassword: string, decodedTo
 
     // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     user!.save();
- 
 };
 
 export const AuthService = {
-    credentialLogin,
     getNewAccessToken,
     resetPassword,
 }

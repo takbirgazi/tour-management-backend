@@ -3,7 +3,40 @@ import { Strategy as GoogleStrategy, Profile, VerifyCallback } from "passport-go
 import { envVars } from "./env";
 import { User } from "../modules/users/user.model";
 import { Role } from "../modules/users/user.interface";
+import { Strategy as LocalStrategy } from "passport-local";
+import bcryptjs from 'bcryptjs';
 
+
+
+passport.use(
+    new LocalStrategy({
+        usernameField: "email",
+        passwordField: "password"
+    }, async (email: string, password: string, done) => {
+        try {
+            const isExistUser = await User.findOne({ email });
+            if (!isExistUser) {
+                return done(null, false, { message: "User does not found" });
+            }
+
+            const isGoogleAuth = isExistUser?.auths.some(provObj => provObj.provider == "google");
+
+            if (isGoogleAuth && !isExistUser.password) {
+                return done(null, false, { message: "You are register with google before." })
+            }
+
+            const isPasswordMath = await bcryptjs.compare(password as string, isExistUser.password as string);
+
+            if (!isPasswordMath) {
+                return done(null, false, { message: "Password not match!" });
+            }
+
+            return done(null, isExistUser);
+        } catch (error) {
+            return done(error)
+        }
+    })
+);
 
 passport.use(
     new GoogleStrategy({

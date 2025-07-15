@@ -17,6 +17,31 @@ const passport_google_oauth20_1 = require("passport-google-oauth20");
 const env_1 = require("./env");
 const user_model_1 = require("../modules/users/user.model");
 const user_interface_1 = require("../modules/users/user.interface");
+const passport_local_1 = require("passport-local");
+const bcryptjs_1 = __importDefault(require("bcryptjs"));
+passport_1.default.use(new passport_local_1.Strategy({
+    usernameField: "email",
+    passwordField: "password"
+}, (email, password, done) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        const isExistUser = yield user_model_1.User.findOne({ email });
+        if (!isExistUser) {
+            return done(null, false, { message: "User does not found" });
+        }
+        const isGoogleAuth = isExistUser === null || isExistUser === void 0 ? void 0 : isExistUser.auths.some(provObj => provObj.provider == "google");
+        if (isGoogleAuth && !isExistUser.password) {
+            return done(null, false, { message: "You are register with google before." });
+        }
+        const isPasswordMath = yield bcryptjs_1.default.compare(password, isExistUser.password);
+        if (!isPasswordMath) {
+            return done(null, false, { message: "Password not match!" });
+        }
+        return done(null, isExistUser);
+    }
+    catch (error) {
+        return done(error);
+    }
+})));
 passport_1.default.use(new passport_google_oauth20_1.Strategy({
     clientID: env_1.envVars.GOOGLE_CLIENT_ID,
     clientSecret: env_1.envVars.GOOGLE_CLIENT_SECRET,

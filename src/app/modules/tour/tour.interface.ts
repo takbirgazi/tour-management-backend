@@ -6,12 +6,14 @@ export interface ITourType {
 
 export interface ITour {
     title: string,
-    slag: string,
+    slug: string,
     description?: string,
     images?: string[],
     location?: string,
     costFrom?: number,
     startDate?: Date,
+    departureLocation?: string,
+    arrivalLocation?: string,
     endDate?: Date,
     included?: string[],
     excluded?: string[],

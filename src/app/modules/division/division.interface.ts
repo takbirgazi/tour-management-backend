@@ -1,6 +1,6 @@
 export interface IDivision {
-    name: string,
-    slag: string,
-    thumbnail?: string,
+    name: string;
+    slug: string;
+    thumbnail?: string;
     description?: string
 }

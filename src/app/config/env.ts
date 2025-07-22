@@ -24,10 +24,15 @@ interface EnvVariable {
         SSL_STORE_PASS: string,
         SSL_PAYMENT_API: string,
         SSL_VALIDATION_API: string,
+    },
+    CLOUDINARY: {
+        CLOUDINARY_CLOUD_NAME: string,
+        CLOUDINARY_API_KEY: string,
+        CLOUDINARY_API_SECRET: string,
     }
 }
 const loadEnv = (): EnvVariable => {
-    const requireVar: string[] = ["PORT", "DB_URL", "NODE_ENV", "JWT_ACCESS_SECRET", "JWT_ACCESS_EXPIRES", "JWT_REFRESH_SECRET", "JWT_REFRESH_EXPIRES", "BCRYPT_SALT_ROUND", "SUPER_ADMIN_EMAIL", "SUPER_ADMIN_PASSWORD", "GOOGLE_CLIENT_ID", "GOOGLE_CLIENT_SECRET", "GOOGLE_CALLBACK_URL", "EXPRESS_SESSION_SECRET", "FRONTEND_URL", "BACKEND_URL", "SSL_STORE_ID", "SSL_STORE_PASS", "SSL_PAYMENT_API", "SSL_VALIDATION_API"];
+    const requireVar: string[] = ["PORT", "DB_URL", "NODE_ENV", "JWT_ACCESS_SECRET", "JWT_ACCESS_EXPIRES", "JWT_REFRESH_SECRET", "JWT_REFRESH_EXPIRES", "BCRYPT_SALT_ROUND", "SUPER_ADMIN_EMAIL", "SUPER_ADMIN_PASSWORD", "GOOGLE_CLIENT_ID", "GOOGLE_CLIENT_SECRET", "GOOGLE_CALLBACK_URL", "EXPRESS_SESSION_SECRET", "FRONTEND_URL", "BACKEND_URL", "SSL_STORE_ID", "SSL_STORE_PASS", "SSL_PAYMENT_API", "SSL_VALIDATION_API", "CLOUDINARY_CLOUD_NAME", "CLOUDINARY_API_KEY", "CLOUDINARY_API_SECRET"];
 
     requireVar.forEach(key => {
         if (!process.env[key]) {
@@ -57,6 +62,11 @@ const loadEnv = (): EnvVariable => {
             SSL_STORE_PASS: process.env.SSL_STORE_PASS as string,
             SSL_PAYMENT_API: process.env.SSL_PAYMENT_API as string,
             SSL_VALIDATION_API: process.env.SSL_VALIDATION_API as string,
+        },
+        CLOUDINARY: {
+            CLOUDINARY_CLOUD_NAME: process.env.CLOUDINARY_CLOUD_NAME as string,
+            CLOUDINARY_API_KEY: process.env.CLOUDINARY_API_KEY as string,
+            CLOUDINARY_API_SECRET: process.env.CLOUDINARY_API_SECRET as string,
         }
     }
 }

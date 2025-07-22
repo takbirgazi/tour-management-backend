@@ -10,6 +10,7 @@ import "./app/config/passport";
 
 const app = express();
 app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
 app.use(expressSession({
     secret: "session-secret",
     resave: false,

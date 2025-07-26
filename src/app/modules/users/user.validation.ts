@@ -11,7 +11,7 @@ export const createZodSchema = z.object({
 
 export const updateZodSchema = z.object({
     name: z.string({ invalid_type_error: "Name must be string" }).min(3, { message: "Name must be minimum 3 character" }).optional(),
-    password: z.string().min(8, { message: "Password must minimum 8 characters" }).regex(/^(?=.*[A-Z])/, { message: "Password must contain at least 1 uppercase letter" }).regex(/^(?=.*[!@#$%^&*])/, { message: "Password must contain at least 1 special character" }).regex(/^(?=.*\d)/, { message: "Password must contain at least 1 number" }).optional(),
+    // password: z.string().min(8, { message: "Password must minimum 8 characters" }).regex(/^(?=.*[A-Z])/, { message: "Password must contain at least 1 uppercase letter" }).regex(/^(?=.*[!@#$%^&*])/, { message: "Password must contain at least 1 special character" }).regex(/^(?=.*\d)/, { message: "Password must contain at least 1 number" }).optional(),
     role: z.enum(Object.values(Role) as [string]).optional(),
     isActive: z.enum(Object.values(IsActive) as [string]).optional(),
     isDeleted: z.boolean({ invalid_type_error: "isDeleted must be true or false" }).optional(),

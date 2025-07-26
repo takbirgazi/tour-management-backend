@@ -1,7 +1,7 @@
 import express, { Request, Response } from "express";
 import cors from "cors";
 import { router } from "./app/routes";
-import { globalError } from "./app/middlewares/globalErrorHandlers"; 
+import { globalError } from "./app/middlewares/globalErrorHandlers";
 import notFound from "./app/middlewares/notFound";
 import cookieParser from "cookie-parser";
 import passport from "passport";
@@ -20,7 +20,10 @@ app.use(expressSession({
 app.use(passport.initialize());
 app.use(passport.session());
 app.use(cookieParser());
-app.use(cors())
+app.use(cors({
+    origin: envVars.FRONTEND_URL,
+    credentials: true,
+}))
 
 app.use("/api/v1", router);
 

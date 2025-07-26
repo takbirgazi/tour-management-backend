@@ -80,20 +80,63 @@ const logOut = catchAsync(async (req: Request, res: Response) => {
     })
 });
 
-const resetPassword = catchAsync(async (req: Request, res: Response) => {
+const changePassword = catchAsync(async (req: Request, res: Response) => {
 
-    const oldPassword = req.body.oldPassword
     const newPassword = req.body.newPassword;
-    const decodedToken = req.user;
-    await AuthService.resetPassword(oldPassword, newPassword, decodedToken as JwtPayload);
+    const oldPassword = req.body.oldPassword;
+    const decodedToken = req.user
+
+    await AuthService.changePassword(oldPassword, newPassword, decodedToken as JwtPayload);
 
     sendResponse(res, {
-        statusCode: httpStatusCode.OK,
         success: true,
-        message: "Password Changed Successfully!",
-        data: null
+        statusCode: httpStatusCode.OK,
+        message: "Password Changed Successfully",
+        data: null,
+    })
+})
+
+const resetPassword = catchAsync(async (req: Request, res: Response) => {
+    const decodedToken = req.user
+    await AuthService.resetPassword(req.body, decodedToken as JwtPayload);
+
+    sendResponse(res, {
+        success: true,
+        statusCode: httpStatusCode.OK,
+        message: "Password Changed Successfully",
+        data: null,
     })
 });
+
+const setPassword = catchAsync(async (req: Request, res: Response) => {
+
+    const decodedToken = req.user as JwtPayload
+    const { password } = req.body;
+
+    await AuthService.setPassword(decodedToken.userId, password);
+
+    sendResponse(res, {
+        success: true,
+        statusCode: httpStatusCode.OK,
+        message: "Password Changed Successfully",
+        data: null,
+    })
+});
+
+const forgotPassword = catchAsync(async (req: Request, res: Response) => {
+
+
+    const { email } = req.body;
+
+    await AuthService.forgotPassword(email);
+
+    sendResponse(res, {
+        success: true,
+        statusCode: httpStatusCode.OK,
+        message: "Email Sent Successfully",
+        data: null,
+    })
+})
 
 const googleCallback = catchAsync(async (req: Request, res: Response) => {
     let redirectTo = req.query.state ? req.query.state as string : "";
@@ -115,6 +158,9 @@ export const AuthControllers = {
     credentialLogin,
     getNewAccessToken,
     logOut,
+    changePassword,
     resetPassword,
+    setPassword,
+    forgotPassword,
     googleCallback,
 }

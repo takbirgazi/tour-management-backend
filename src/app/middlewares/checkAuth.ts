@@ -11,32 +11,31 @@ import { IsActive } from "../modules/users/user.interface";
 export const checkAuth = (...authRoles: string[]) => async (req: Request, res: Response, next: NextFunction) => {
     try {
         const accessToken = req.headers.authorization;
+
         if (!accessToken) {
-            throw new AppError(403, "No Access Token Found");
+            throw new AppError(403, "No Token Received")
         }
-        const verifiedToken = verifyToken(accessToken, envVars.JWT_ACCESS_SECRET) as JwtPayload;
+        const verifiedToken = verifyToken(accessToken, envVars.JWT_ACCESS_SECRET) as JwtPayload
 
-        const isExistUser = await User.findOne({ email: verifiedToken.email });
+        const isUserExist = await User.findOne({ email: verifiedToken.email })
 
-        if (!isExistUser) {
-            throw new AppError(statusCode.BAD_REQUEST, "User doesn't Exist!");
+        if (!isUserExist) {
+            throw new AppError(statusCode.BAD_REQUEST, "User does not exist")
         }
-        if (isExistUser.isActive === IsActive.BLOCKED || isExistUser.isActive === IsActive.INACTIVE) {
-            throw new AppError(statusCode.BAD_REQUEST, `User is ${isExistUser.isActive}`);
+        if (!isUserExist.isVerified) {
+            throw new AppError(statusCode.BAD_REQUEST, "User is not verified")
         }
-        if (isExistUser.isDeleted) {
-            throw new AppError(statusCode.BAD_REQUEST, "User is deleted");
+        if (isUserExist.isActive === IsActive.BLOCKED || isUserExist.isActive === IsActive.INACTIVE) {
+            throw new AppError(statusCode.BAD_REQUEST, `User is ${isUserExist.isActive}`)
+        }
+        if (isUserExist.isDeleted) {
+            throw new AppError(statusCode.BAD_REQUEST, "User is deleted")
         }
 
-        if (!verifiedToken) {
-            throw new AppError(403, "You are not authorize!");
-        }
         if (!authRoles.includes(verifiedToken.role)) {
-            throw new AppError(403, "You can't access!");
+            throw new AppError(403, "You are not permitted to view this route!!!")
         }
-
         req.user = verifiedToken;
-
         next();
     } catch (err) {
         next(err);

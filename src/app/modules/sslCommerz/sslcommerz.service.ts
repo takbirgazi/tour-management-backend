@@ -1,8 +1,10 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import axios from "axios";
 import { envVars } from "../../config/env";
 import { ISSLCommerz } from "./sslcommerz.interface";
 import statusCode from "http-status-codes";
 import AppError from "../../errorHelpers/AppError";
+import { Payment } from "../payment/payment.model";
 
 
 const sslPaymentInit = async (payload: ISSLCommerz) => {
@@ -17,7 +19,7 @@ const sslPaymentInit = async (payload: ISSLCommerz) => {
             success_url: `${envVars.BACKEND_URL}/api/v1/payment/success?transactionId=${payload.transactionId}&amount=${payload.amount}&status=success`,
             fail_url: `${envVars.BACKEND_URL}/api/v1/payment/fail?transactionId=${payload.transactionId}&amount=${payload.amount}&status=fail`,
             cancel_url: `${envVars.BACKEND_URL}/api/v1/payment/cancel?transactionId=${payload.transactionId}&amount=${payload.amount}&status=cancel`,
-            // ipn_url: "http://localhost:3030/ipn",
+            ipn_url: `${envVars.BACKEND_URL}/api/v1/payment/validate-payment`,
             shipping_method: "N/A",
             product_name: "Tour",
             product_category: "Service",
@@ -48,13 +50,25 @@ const sslPaymentInit = async (payload: ISSLCommerz) => {
             headers: { "Content-Type": "application/x-www-form-urlencoded" }
         });
         return response.data;
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (error: any) {
         throw new AppError(statusCode.BAD_REQUEST, error.message)
     }
 };
 
+const validatePayment = async (payload: any) => {
+    try {
+        const response = await axios({
+            method: "GET",
+            url: `${envVars.SSL.SSL_VALIDATION_API}?val_id=${payload.val_id}&store_id=${envVars.SSL.SSL_STORE_ID}&store_passwd=${envVars.SSL.SSL_STORE_PASS}`,
+        });
+        await Payment.updateOne({ transactionId: payload.tran_id }, { paymentGetawayData: response.data }, { runValidators: true })
+    } catch (error: any) {
+        throw new AppError(statusCode.BAD_REQUEST, error.message)
+    }
+}
+
 
 export const SSLService = {
-    sslPaymentInit
+    sslPaymentInit,
+    validatePayment
 }

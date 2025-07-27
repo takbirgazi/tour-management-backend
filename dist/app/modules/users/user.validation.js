@@ -15,7 +15,7 @@ exports.createZodSchema = zod_1.default.object({
 });
 exports.updateZodSchema = zod_1.default.object({
     name: zod_1.default.string({ invalid_type_error: "Name must be string" }).min(3, { message: "Name must be minimum 3 character" }).optional(),
-    password: zod_1.default.string().min(8, { message: "Password must minimum 8 characters" }).regex(/^(?=.*[A-Z])/, { message: "Password must contain at least 1 uppercase letter" }).regex(/^(?=.*[!@#$%^&*])/, { message: "Password must contain at least 1 special character" }).regex(/^(?=.*\d)/, { message: "Password must contain at least 1 number" }).optional(),
+    // password: z.string().min(8, { message: "Password must minimum 8 characters" }).regex(/^(?=.*[A-Z])/, { message: "Password must contain at least 1 uppercase letter" }).regex(/^(?=.*[!@#$%^&*])/, { message: "Password must contain at least 1 special character" }).regex(/^(?=.*\d)/, { message: "Password must contain at least 1 number" }).optional(),
     role: zod_1.default.enum(Object.values(user_interface_1.Role)).optional(),
     isActive: zod_1.default.enum(Object.values(user_interface_1.IsActive)).optional(),
     isDeleted: zod_1.default.boolean({ invalid_type_error: "isDeleted must be true or false" }).optional(),

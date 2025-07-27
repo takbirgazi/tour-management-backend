@@ -23,24 +23,24 @@ const checkAuth = (...authRoles) => (req, res, next) => __awaiter(void 0, void 0
     try {
         const accessToken = req.headers.authorization;
         if (!accessToken) {
-            throw new AppError_1.default(403, "No Access Token Found");
+            throw new AppError_1.default(403, "No Token Received");
         }
         const verifiedToken = (0, jwt_1.verifyToken)(accessToken, env_1.envVars.JWT_ACCESS_SECRET);
-        const isExistUser = yield user_model_1.User.findOne({ email: verifiedToken.email });
-        if (!isExistUser) {
-            throw new AppError_1.default(http_status_codes_1.default.BAD_REQUEST, "User doesn't Exist!");
+        const isUserExist = yield user_model_1.User.findOne({ email: verifiedToken.email });
+        if (!isUserExist) {
+            throw new AppError_1.default(http_status_codes_1.default.BAD_REQUEST, "User does not exist");
         }
-        if (isExistUser.isActive === user_interface_1.IsActive.BLOCKED || isExistUser.isActive === user_interface_1.IsActive.INACTIVE) {
-            throw new AppError_1.default(http_status_codes_1.default.BAD_REQUEST, `User is ${isExistUser.isActive}`);
+        if (!isUserExist.isVerified) {
+            throw new AppError_1.default(http_status_codes_1.default.BAD_REQUEST, "User is not verified");
         }
-        if (isExistUser.isDeleted) {
+        if (isUserExist.isActive === user_interface_1.IsActive.BLOCKED || isUserExist.isActive === user_interface_1.IsActive.INACTIVE) {
+            throw new AppError_1.default(http_status_codes_1.default.BAD_REQUEST, `User is ${isUserExist.isActive}`);
+        }
+        if (isUserExist.isDeleted) {
             throw new AppError_1.default(http_status_codes_1.default.BAD_REQUEST, "User is deleted");
         }
-        if (!verifiedToken) {
-            throw new AppError_1.default(403, "You are not authorize!");
-        }
         if (!authRoles.includes(verifiedToken.role)) {
-            throw new AppError_1.default(403, "You can't access!");
+            throw new AppError_1.default(403, "You are not permitted to view this route!!!");
         }
         req.user = verifiedToken;
         next();

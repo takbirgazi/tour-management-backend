@@ -11,6 +11,7 @@ import { envVars } from "./app/config/env";
 
 const app = express();
 app.use(express.json());
+app.set("trust proxy", 1); // trust first proxy
 app.use(express.urlencoded({ extended: true }));
 app.use(expressSession({
     secret: envVars.EXPRESS_SESSION_SECRET,

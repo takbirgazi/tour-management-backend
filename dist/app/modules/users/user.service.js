@@ -42,25 +42,27 @@ const createUser = (payload) => __awaiter(void 0, void 0, void 0, function* () {
     return user;
 });
 const updateUser = (userId, payload, decodedToken) => __awaiter(void 0, void 0, void 0, function* () {
+    if (decodedToken.role === user_interface_1.Role.USER || decodedToken.role === user_interface_1.Role.GUIDE) {
+        if (userId !== decodedToken.userId) {
+            throw new AppError_1.default(http_status_codes_1.default.FORBIDDEN, "You are not authorize!");
+        }
+    }
     const ifUserExist = yield user_model_1.User.findById(userId);
     if (!ifUserExist) {
         throw new AppError_1.default(http_status_codes_1.default.NOT_FOUND, "User Not Found!");
+    }
+    if (decodedToken.role === user_interface_1.Role.ADMIN && ifUserExist.role === user_interface_1.Role.SUPER_ADMIN) {
+        throw new AppError_1.default(http_status_codes_1.default.FORBIDDEN, "You are not authorize!");
     }
     if (payload.role) {
         if (decodedToken.role === user_interface_1.Role.USER || decodedToken.role === user_interface_1.Role.GUIDE) {
             throw new AppError_1.default(http_status_codes_1.default.FORBIDDEN, "You are not authorize!");
         }
     }
-    if (payload.role === user_interface_1.Role.SUPER_ADMIN && decodedToken.role === user_interface_1.Role.ADMIN) {
-        throw new AppError_1.default(http_status_codes_1.default.FORBIDDEN, "You are not authorize!");
-    }
     if (payload.isActive || payload.isDeleted || payload.isVerified) {
         if (decodedToken.role === user_interface_1.Role.USER || decodedToken.role === user_interface_1.Role.GUIDE) {
             throw new AppError_1.default(http_status_codes_1.default.FORBIDDEN, "You are not authorize!");
         }
-    }
-    if (payload.password) {
-        payload.password = yield bcryptjs_1.default.hash(payload.password, Number(env_1.envVars.BCRYPT_SALT_ROUND));
     }
     const newUpdateUser = yield user_model_1.User.findByIdAndUpdate(userId, payload, { new: true, runValidators: true });
     return newUpdateUser;
@@ -75,8 +77,15 @@ const getAllUser = () => __awaiter(void 0, void 0, void 0, function* () {
         }
     };
 });
+const getMe = (userId) => __awaiter(void 0, void 0, void 0, function* () {
+    const user = yield user_model_1.User.findById(userId).select("-password");
+    return {
+        data: user
+    };
+});
 exports.UserServices = {
     createUser,
     getAllUser,
     updateUser,
+    getMe,
 };

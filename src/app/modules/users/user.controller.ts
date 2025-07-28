@@ -33,14 +33,13 @@ const updateUser = catchAsync(async (req: Request, res: Response) => {
 });
 
 const getAllUser = catchAsync(async (req: Request, res: Response) => {
-    const users = await UserServices.getAllUser();
+    const query = req.query;
+    const users = await UserServices.getAllUser(query as Record<string, string>);
     sendResponse(res, {
         statusCode: httpStatusCode.OK,
         success: true,
         message: "User Retrieve Successfully!",
-        meta: {
-            total: users.meta.total
-        },
+        meta: users.meta,
         data: users.data,
     });
 });

@@ -61,6 +61,12 @@ const updateTour = (id, payload) => __awaiter(void 0, void 0, void 0, function* 
     }
     return updatedTour;
 });
+const getSingleTour = (slug) => __awaiter(void 0, void 0, void 0, function* () {
+    const tour = yield tour_model_1.Tour.findOne({ slug });
+    return {
+        data: tour,
+    };
+});
 const deleteTour = (id) => __awaiter(void 0, void 0, void 0, function* () {
     return yield tour_model_1.Tour.findByIdAndDelete(id);
 });
@@ -84,6 +90,12 @@ const updateTourType = (id, payload) => __awaiter(void 0, void 0, void 0, functi
     const updatedTourType = yield tour_model_1.TourType.findByIdAndUpdate(id, { name }, { new: true });
     return updatedTourType;
 });
+const getSingleTourType = (id) => __awaiter(void 0, void 0, void 0, function* () {
+    const tourType = yield tour_model_1.TourType.findById(id);
+    return {
+        data: tourType
+    };
+});
 const deleteTourType = (id) => __awaiter(void 0, void 0, void 0, function* () {
     const existingTourType = yield tour_model_1.TourType.findById(id);
     if (!existingTourType) {
@@ -92,12 +104,14 @@ const deleteTourType = (id) => __awaiter(void 0, void 0, void 0, function* () {
     return yield tour_model_1.TourType.findByIdAndDelete(id);
 });
 exports.TourService = {
-    createTour,
     createTourType,
     deleteTourType,
     updateTourType,
     getAllTourTypes,
+    getSingleTourType,
+    createTour,
     getAllTours,
     updateTour,
+    getSingleTour,
     deleteTour,
 };

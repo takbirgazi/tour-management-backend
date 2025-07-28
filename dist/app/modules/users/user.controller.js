@@ -62,9 +62,20 @@ const getMe = (0, catchAsync_1.catchAsync)((req, res) => __awaiter(void 0, void 
         data: result.data
     });
 }));
+const getSingleUser = (0, catchAsync_1.catchAsync)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const id = req.params.id;
+    const result = yield user_service_1.UserServices.getSingleUser(id);
+    (0, sendResponse_1.default)(res, {
+        success: true,
+        statusCode: http_status_codes_1.default.CREATED,
+        message: "User Retrieved Successfully",
+        data: result.data
+    });
+}));
 exports.UserControllers = {
     createUser,
     getAllUser,
     updateUser,
     getMe,
+    getSingleUser,
 };

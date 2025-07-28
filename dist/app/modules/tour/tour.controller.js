@@ -68,6 +68,16 @@ const getAllTourTypes = (0, catchAsync_1.catchAsync)((req, res) => __awaiter(voi
         data: result,
     });
 }));
+const getSingleTour = (0, catchAsync_1.catchAsync)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const slug = req.params.slug;
+    const result = yield tour_service_1.TourService.getSingleTour(slug);
+    (0, sendResponse_1.default)(res, {
+        statusCode: 200,
+        success: true,
+        message: 'Tour retrieved successfully',
+        data: result,
+    });
+}));
 const createTourType = (0, catchAsync_1.catchAsync)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const { name } = req.body;
     const result = yield tour_service_1.TourService.createTourType(name);
@@ -89,6 +99,16 @@ const updateTourType = (0, catchAsync_1.catchAsync)((req, res) => __awaiter(void
         data: result,
     });
 }));
+const getSingleTourType = (0, catchAsync_1.catchAsync)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const id = req.params.id;
+    const result = yield tour_service_1.TourService.getSingleTourType(id);
+    (0, sendResponse_1.default)(res, {
+        statusCode: 200,
+        success: true,
+        message: 'Tour type retrieved successfully',
+        data: result,
+    });
+}));
 const deleteTourType = (0, catchAsync_1.catchAsync)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const { id } = req.params;
     const result = yield tour_service_1.TourService.deleteTourType(id);
@@ -100,12 +120,14 @@ const deleteTourType = (0, catchAsync_1.catchAsync)((req, res) => __awaiter(void
     });
 }));
 exports.TourController = {
-    createTour,
     createTourType,
     getAllTourTypes,
     deleteTourType,
     updateTourType,
+    getSingleTourType,
+    createTour,
     getAllTours,
     updateTour,
+    getSingleTour,
     deleteTour,
 };

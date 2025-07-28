@@ -41,14 +41,13 @@ const updateUser = (0, catchAsync_1.catchAsync)((req, res) => __awaiter(void 0, 
     });
 }));
 const getAllUser = (0, catchAsync_1.catchAsync)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    const users = yield user_service_1.UserServices.getAllUser();
+    const query = req.query;
+    const users = yield user_service_1.UserServices.getAllUser(query);
     (0, sendResponse_1.default)(res, {
         statusCode: http_status_codes_1.default.OK,
         success: true,
         message: "User Retrieve Successfully!",
-        meta: {
-            total: users.meta.total
-        },
+        meta: users.meta,
         data: users.data,
     });
 }));

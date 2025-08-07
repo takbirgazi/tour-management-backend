@@ -54,7 +54,7 @@ const credentialLogin = (0, catchAsync_1.catchAsync)((req, res, next) => __await
             data: {
                 accessToken: userToken.accessToken,
                 refreshToken: userToken.refreshToken,
-                user: rest
+                user: Object.assign({}, rest)
             }
         });
     }))(req, res, next);

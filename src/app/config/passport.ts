@@ -2,7 +2,7 @@ import passport from "passport";
 import { Strategy as GoogleStrategy, Profile, VerifyCallback } from "passport-google-oauth20";
 import { envVars } from "./env";
 import { User } from "../modules/users/user.model";
-import { Role } from "../modules/users/user.interface";
+import { IsActive, Role } from "../modules/users/user.interface";
 import { Strategy as LocalStrategy } from "passport-local";
 import bcryptjs from 'bcryptjs';
 
@@ -17,6 +17,17 @@ passport.use(
             const isExistUser = await User.findOne({ email });
             if (!isExistUser) {
                 return done(null, false, { message: "User does not found" });
+            }
+
+            if (!isExistUser.isVerified) {
+                return done("User is not verified")
+            }
+
+            if (isExistUser.isActive === IsActive.BLOCKED || isExistUser.isActive === IsActive.INACTIVE) {
+                return done(`User is ${isExistUser.isActive}`)
+            }
+            if (isExistUser.isDeleted) {
+                return done("User is deleted")
             }
 
             const isGoogleAuth = isExistUser?.auths.some(provObj => provObj.provider == "google");

@@ -35,7 +35,7 @@ const credentialLogin = catchAsync(async (req: Request, res: Response, next: Nex
             data: {
                 accessToken: userToken.accessToken,
                 refreshToken: userToken.refreshToken,
-                user: rest
+                user: { ...rest }
             }
         })
     })(req, res, next)

@@ -28,6 +28,15 @@ passport_1.default.use(new passport_local_1.Strategy({
         if (!isExistUser) {
             return done(null, false, { message: "User does not found" });
         }
+        if (!isExistUser.isVerified) {
+            return done("User is not verified");
+        }
+        if (isExistUser.isActive === user_interface_1.IsActive.BLOCKED || isExistUser.isActive === user_interface_1.IsActive.INACTIVE) {
+            return done(`User is ${isExistUser.isActive}`);
+        }
+        if (isExistUser.isDeleted) {
+            return done("User is deleted");
+        }
         const isGoogleAuth = isExistUser === null || isExistUser === void 0 ? void 0 : isExistUser.auths.some(provObj => provObj.provider == "google");
         if (isGoogleAuth && !isExistUser.password) {
             return done(null, false, { message: "You are register with google before." });
